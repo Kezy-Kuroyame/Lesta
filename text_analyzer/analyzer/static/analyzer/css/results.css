@@ -1,0 +1,46 @@
+/* Стили для сортируемых заголовков */
+.sortable:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.sortable::after {
+    content: '↕';
+    margin-left: 5px;
+    opacity: 0.3;
+}
+
+.sortable.asc::after {
+    content: '↑';
+    opacity: 1;
+}
+
+.sortable.desc::after {
+    content: '↓';
+    opacity: 1;
+}
+
+/* График */
+.chart-container {
+    max-width: 800px;
+    margin: 30px auto;
+}
+
+/* Подсветка важных значений */
+.highlight {
+    background-color: #fffde7;
+}
+
+/* Пагинация */
+.pagination {
+    justify-content: center;
+    margin: 20px 0;
+}
+
+/* Адаптивные таблицы */
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}

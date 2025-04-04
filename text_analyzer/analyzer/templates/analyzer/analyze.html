@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Анализ текстовых файлов</title>
+    {% load static %}
+    <script src="{% static 'analyzer/js/script.js' %}"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .upload-container {
+            margin: 30px 0;
+        }
+        .file-list {
+            margin: 20px 0;
+            text-align: left;
+        }
+        .delete-btn {
+            background: none;
+            border: none;
+            color: red;
+            cursor: pointer;
+            font-size: 20px;
+            margin-left: 10px;
+            padding: 0 5px;
+        }
+
+        .delete-btn:hover {
+            color: darkred;
+        }
+
+        .file-item {
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        .file-item.removing {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+        .add-file-btn {
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+        }
+        .analyze-btn {
+            padding: 10px 20px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .analyze-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+<h1>Загрузите текстовые файлы для анализа</h1>
+    <p>Добавьте текстовый файл</p>
+
+   <form method="post" enctype="multipart/form-data" id="upload-form">
+    {% csrf_token %}
+    <input type="file" name="text_files" multiple id="file-input" style="display:none;">
+
+    <div class="upload-container">
+        <button type="button" class="add-file-btn" id="add-file-btn">+</button>
+    </div>
+
+    <div class="file-list" id="file-list">
+        {% for file in uploaded_files %}
+            <div class="file-item" data-file-index="{{ forloop.counter0 }}">
+                {{ file.name }}
+                <button type="button" class="delete-btn" title="Удалить файл">
+                    ×
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" name="analyze_all" class="analyze-btn" id="analyze-btn"
+            {% if uploaded_files|length < 2 %}disabled{% endif %}>
+        Анализировать ({{ uploaded_files|length }}/10)
+    </button>
+</form>
+
+
+</body>
+</html>

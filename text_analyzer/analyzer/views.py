@@ -1,17 +1,19 @@
 import os
-import json
-import shutil
+import time
 
 import chardet
 import math
 from collections import defaultdict
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
 from django.urls import reverse
 
 from .forms import TextFileForm
 from django.core.files.storage import FileSystemStorage
 from django.core.paginator import Paginator
+
+from system.metrics import metrics
+
+from .models import ProcessedFile
 
 
 def detect_encoding(file):
@@ -70,6 +72,7 @@ def analyze_text(request):
             return handle_file_analysis(request)
         elif form.is_valid():
             return handle_file_upload(request, form)
+
 
     form = TextFileForm()
     return render(request, 'analyzer/analyze.html', {'form': form})
@@ -132,6 +135,8 @@ def handle_file_analysis(request):
     try:
         all_documents_words = []
         for file_info in files:
+            start_time = time.time()
+
             with open(file_info['path'], 'rb') as f:
                 encoding = detect_encoding(f)
                 content = f.read().decode(encoding)
@@ -139,6 +144,18 @@ def handle_file_analysis(request):
                 words = [word.strip('.,!?;:"\'()[]{}') for word in words if word.strip('.,!?;:"\'()[]{}')]
                 all_documents_words.append(words)
 
+            end_time = time.time()
+            processing_time = end_time - start_time
+
+            # 3) Инкрементим метрику в памяти
+            metrics.increment_files_processed()
+
+            # 4) Сохраняем запись в БД
+            ProcessedFile.objects.create(
+                filename=file_info['name'],
+                processing_time=round(processing_time, 5)
+            )
+        print(metrics.get_metrics())
         all_tf_data, idf_dict = calculate_tf_idf(all_documents_words)
 
         all_results = []
@@ -168,9 +185,6 @@ def handle_file_analysis(request):
             'uploaded_files': files,
             'error': f'Ошибка анализа: {str(e)}'
         })
-
-
-from django.core.paginator import Paginator
 
 def handle_get_request(request):
     form = TextFileForm()

@@ -1,0 +1,12 @@
+.env
+.idea/
+
+# Python-cache
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+*.log
+
+
+temp_uploads/

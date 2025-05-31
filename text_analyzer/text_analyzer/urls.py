@@ -20,8 +20,13 @@ from django.conf.urls.static import static
 from analyzer.views import analyze_text
 from text_analyzer import settings
 from analyzer.views import handle_get_request
+from system import endpoints
+
 
 urlpatterns = [
+    path("status", endpoints.status_view),
+    path("version", endpoints.version_view),
+    path("metrics", endpoints.metrics_view),
     path('admin/', admin.site.urls),
     path('', analyze_text, name='analyze'),
     path('results/', handle_get_request, name='results'),

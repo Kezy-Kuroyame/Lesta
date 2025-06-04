@@ -11,8 +11,6 @@ from .forms import TextFileForm
 from django.core.files.storage import FileSystemStorage
 from django.core.paginator import Paginator
 
-from system.metrics import metrics
-
 from .models import ProcessedFile
 
 
@@ -147,15 +145,10 @@ def handle_file_analysis(request):
             end_time = time.time()
             processing_time = end_time - start_time
 
-            # 3) Инкрементим метрику в памяти
-            metrics.increment_files_processed()
-
-            # 4) Сохраняем запись в БД
             ProcessedFile.objects.create(
                 filename=file_info['name'],
                 processing_time=round(processing_time, 5)
             )
-        print(metrics.get_metrics())
         all_tf_data, idf_dict = calculate_tf_idf(all_documents_words)
 
         all_results = []
